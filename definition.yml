@@ -1,6 +1,6 @@
 id: gpfates
-docker_repository: dynverse/dynmethods:gpfates
-container_url: https://github.com/dynverse/dynmethods/tree/master/containers/gpfates
+docker_repository: dynverse/ti_gpfates
+container_url: https://github.com/dynverse/ti_gpfates
 name: GPfates
 type: algorithm
 platform: Python
