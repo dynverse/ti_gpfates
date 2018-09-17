@@ -1,6 +1,6 @@
 FROM dynverse/dynwrap:py3.6
 
-LABEL version 0.1.1
+LABEL version 0.1.2
 
 RUN pip install GPy
 RUN pip install git+https://github.com/SheffieldML/GPclust.git
