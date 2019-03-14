@@ -29,11 +29,12 @@ container:
 wrapper:
   type: end_state_probabilities
   topology_inference: parameter
+  
   trajectory_types:
   - linear
   - bifurcation
   - multifurcation
-  example:
+  
   input_required:
   - expression
   - end_n
