@@ -9,10 +9,10 @@ data <- dyntoy::generate_dataset(
   model = "multifurcating",
   normalise = FALSE
 )
-params <- list()
+parameters <- list()
 
 # add method specific args (if needed)
-data$params <- list()
+data$parameters <- list()
 data$seed <- 1
 
 # write example dataset to file
