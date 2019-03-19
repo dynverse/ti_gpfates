@@ -20,7 +20,7 @@ checkpoints = {}
 #   Load data                                                               ####
 end_n = task["priors"]["end_n"]
 
-p = task["params"]
+p = task["parameters"]
 
 expression = task["expression"]
 expression = expression[(expression > p["log_expression_cutoff"]).sum(1) >= p["min_cells_expression_cutoff"]]
