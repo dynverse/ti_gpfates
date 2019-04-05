@@ -1,3 +1,12 @@
+#!/usr/local/bin/python
+
+import dynclipy
+task = dynclipy.main()
+# task = dynclipy.main(
+#   ["--dataset", "/code/example.h5", "--output", "/mnt/output"],
+#   "/code/definition.yml"
+# )
+
 import pandas as pd
 import numpy as np
 import json
@@ -9,11 +18,12 @@ checkpoints = {}
 
 #   ____________________________________________________________________________
 #   Load data                                                               ####
-p = json.load(open("/ti/input/params.json", "r"))
-end_n = json.load(open("/ti/input/end_n.json"))[0]
-expression = pd.read_csv("/ti/input/expression.csv", index_col=0, header=0)
-expression = expression[(expression > p["log_expression_cutoff"]).sum(1) >= p["min_cells_expression_cutoff"]]
+end_n = task["priors"]["end_n"]
 
+p = task["parameters"]
+
+expression = task["expression"]
+expression = expression[(expression > p["log_expression_cutoff"]).sum(1) >= p["min_cells_expression_cutoff"]]
 if expression.shape[0] == 0:
   raise ValueError("Expression preprocessing filtered out all cells")
 
@@ -38,26 +48,23 @@ checkpoints["method_aftermethod"] = time.time()
 
 #   ____________________________________________________________________________
 #   Process and save output                                                 ####
-# cell ids
-cell_ids = pd.DataFrame({
-  "cell_ids": m.s.pseudotime.index
-})
-cell_ids.to_csv("/ti/output/cell_ids.csv", index=False)
-
 # pseudotime
 pseudotime = m.s.pseudotime.reset_index()
 pseudotime.columns = ["cell_id", "pseudotime"]
-pseudotime.to_csv("/ti/output/pseudotime.csv", index=False)
 
 # dimred
 dimred = pd.DataFrame(m.dr_models["bgplvm"].X.mean[:,:].tolist())
 dimred["cell_id"] = m.s.pseudotime.index.tolist()
-dimred.to_csv("/ti/output/dimred.csv", index=False)
 
 # progressions
 end_state_probabilities = pd.DataFrame(m.fate_model.phi)
 end_state_probabilities["cell_id"] = m.s.pseudotime.index.tolist()
-end_state_probabilities.to_csv("/ti/output/end_state_probabilities.csv", index=False)
 
-# timings
-json.dump(checkpoints, open("/ti/output/timings.json", "w"))
+# save
+dataset = dynclipy.wrap_data(cell_ids = m.s.pseudotime.index)
+dataset.add_end_state_probabilities(
+  end_state_probabilities = end_state_probabilities,
+  pseudotime = pseudotime
+)
+dataset.add_timings(timings = checkpoints)
+dataset.write_output(task["output"])
